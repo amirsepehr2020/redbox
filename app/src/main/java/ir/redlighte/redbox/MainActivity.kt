@@ -59,7 +59,7 @@ private data class Subject(val id:Int,val name:String,val grade:String,val credi
  var screen by remember{mutableStateOf("home")}
  RedBoxTheme(darkTheme=darkTheme){
   Surface(Modifier.fillMaxSize(),color=MaterialTheme.colorScheme.background){
-   AnimatedContent(targetState=screen,label="screen",transitionSpec={fadeIn()+fadeOut() togetherWith fadeOut()+fadeIn()}){current->
+   AnimatedContent(targetState=screen,label="screen",transitionSpec={fadeIn() togetherWith fadeOut()}){current->
     when(current){
      "calculator"->CalculatorScreen{screen="home"}
      "timer"->FocusTimerScreen{screen="home"}
