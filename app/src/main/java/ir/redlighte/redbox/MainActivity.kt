@@ -40,79 +40,178 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import java.util.Locale
 
-private val Red=Color(0xFFE53935); private val RedDark=Color(0xFFB71C1C)
-private const val TIMER_PREFS="redbox_timer"; private const val ALARM_REQUEST=4103
+private val Red = Color(0xFFE53935)
+private const val TIMER_PREFS = "redbox_timer"
+private const val ALARM_REQUEST = 4103
 
-class MainActivity:ComponentActivity(){
- private val notificationPermission=registerForActivityResult(ActivityResultContracts.RequestPermission()){ }
- override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);enableEdgeToEdge();if(Build.VERSION.SDK_INT>=33)notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);setContent{RedBoxApp()}}
-}
-private data class Tool(val title:String,val subtitle:String,val icon:ImageVector)
-private val tools=listOf(
- Tool("Calculator","Fast calculations",Icons.Rounded.Calculate),Tool("Focus Timer","Pomodoro & focus",Icons.Rounded.Schedule),Tool("GPA Calculator","Calculate your GPA",Icons.Rounded.Checklist),Tool("Notes","Quick notes & lists",Icons.Rounded.EditNote),Tool("Converter","Units & values",Icons.Rounded.SwapHoriz),Tool("More Tools","5 useful utilities",Icons.Rounded.Construction))
-private data class Subject(val id:Int,val name:String,val grade:String,val credits:String)
+private data class Tool(val title: String, val subtitle: String, val icon: ImageVector)
+private val tools = listOf(
+    Tool("Calculator", "Fast calculations", Icons.Rounded.Calculate),
+    Tool("Focus Timer", "Pomodoro & focus", Icons.Rounded.Schedule),
+    Tool("GPA Calculator", "Calculate your GPA", Icons.Rounded.Checklist),
+    Tool("Notes", "Quick notes & lists", Icons.Rounded.EditNote),
+    Tool("Converter", "Units & values", Icons.Rounded.SwapHoriz),
+    Tool("More Tools", "5 useful utilities", Icons.Rounded.Construction)
+)
+private data class Subject(val id: Int, val name: String, val grade: String, val credits: String)
 
-@Composable private fun RedBoxApp(){
- val context=LocalContext.current
- val savedTheme=AppPreferences.isDarkTheme(context)
- var darkTheme by remember(savedTheme){mutableStateOf(savedTheme ?: androidx.compose.foundation.isSystemInDarkTheme())}
- var screen by remember{mutableStateOf("home")}
- RedBoxTheme(darkTheme=darkTheme){
-  Surface(Modifier.fillMaxSize(),color=MaterialTheme.colorScheme.background){
-   AnimatedContent(targetState=screen,label="screen",transitionSpec={fadeIn() togetherWith fadeOut()}){current->
-    when(current){
-     "calculator"->CalculatorScreen{screen="home"}
-     "timer"->FocusTimerScreen{screen="home"}
-     "gpa"->GpaCalculatorScreen{screen="home"}
-     "notes"->NotesScreen{screen="home"}
-     "converter"->UnitConverterScreen{screen="home"}
-     "more"->MoreToolsScreen{screen="home"}
-     "settings"->SettingsScreen(darkTheme=darkTheme,onDarkThemeChange={darkTheme=it;AppPreferences.setDarkTheme(context,it)},onBack={screen="home"})
-     "about"->AboutScreen{screen="home"}
-     else->HomeScreen(onTool={screen=when(it){"Calculator"->"calculator";"Focus Timer"->"timer";"GPA Calculator"->"gpa";"Notes"->"notes";"Converter"->"converter";"More Tools"->"more";else->"home"}},onSettings={screen="settings"},onAbout={screen="about"})
+class MainActivity : ComponentActivity() {
+    private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        if (Build.VERSION.SDK_INT >= 33) notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        setContent { RedBoxApp() }
     }
-   }
-  }
- }
 }
 
-@Composable private fun HomeScreen(onTool:(String)->Unit,onSettings:()->Unit,onAbout:()->Unit){
- Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface).padding(horizontal=20.dp),horizontalAlignment=Alignment.CenterHorizontally){
-  Spacer(Modifier.height(28.dp))
-  Row(Modifier.fillMaxWidth(),Alignment.CenterVertically){
-   Box(Modifier.size(48.dp).background(Red,RoundedCornerShape(16.dp)),Alignment.Center){Text("R",color=Color.White,fontWeight=FontWeight.Black)}
-   Column(Modifier.padding(start=12.dp).weight(1f)){Text("RedBox",style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold);Text("Everything you need. One RedBox.",style=MaterialTheme.typography.bodySmall)}
-   IconButton(onClick=onAbout){Icon(Icons.Rounded.Info,"About RedBox",tint=Red)}
-   IconButton(onClick=onSettings){Icon(Icons.Rounded.Settings,"Settings",tint=Red)}
-  }
-  Spacer(Modifier.height(22.dp))
-  Card(Modifier.fillMaxWidth(),RoundedCornerShape(28.dp),colors=CardDefaults.cardColors(containerColor=Red)){
-   Column(Modifier.padding(22.dp)){Text("Your toolbox, simplified.",color=Color.White,style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold);Spacer(Modifier.height(6.dp));Text("Useful tools for school, study and everyday life — all in one place.",color=Color.White.copy(.88f))}
-  }
-  Spacer(Modifier.height(24.dp))
-  Row(Modifier.fillMaxWidth(),Arrangement.SpaceBetween,Alignment.CenterVertically){Text("Quick Tools",fontWeight=FontWeight.Bold,style=MaterialTheme.typography.titleMedium);Text("v0.8.0",color=Red,fontWeight=FontWeight.SemiBold)}
-  Spacer(Modifier.height(12.dp))
-  LazyVerticalGrid(GridCells.Adaptive(minSize=155.dp),Modifier.fillMaxWidth(),contentPadding=PaddingValues(bottom=28.dp),horizontalArrangement=Arrangement.spacedBy(12.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){items(tools){ToolCard(it){onTool(it.title)}}}
- }
+@Composable
+private fun RedBoxApp() {
+    val context = LocalContext.current
+    val savedTheme = AppPreferences.isDarkTheme(context)
+    var darkTheme by remember(savedTheme) { mutableStateOf(savedTheme ?: androidx.compose.foundation.isSystemInDarkTheme()) }
+    var screen by remember { mutableStateOf("home") }
+    RedBoxTheme(darkTheme = darkTheme) {
+        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            AnimatedContent(screen, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "navigation") { current ->
+                when (current) {
+                    "calculator" -> CalculatorScreen { screen = "home" }
+                    "timer" -> FocusTimerScreen { screen = "home" }
+                    "gpa" -> GpaCalculatorScreen { screen = "home" }
+                    "notes" -> NotesScreen { screen = "home" }
+                    "converter" -> UnitConverterScreen { screen = "home" }
+                    "more" -> MoreToolsScreen { screen = "home" }
+                    "settings" -> SettingsScreen(darkTheme, { darkTheme = it; AppPreferences.setDarkTheme(context, it) }) { screen = "home" }
+                    "about" -> AboutScreen { screen = "home" }
+                    else -> HomeScreen(
+                        onTool = { title ->
+                            DashboardPreferences.addRecent(context, title)
+                            screen = when (title) {
+                                "Calculator" -> "calculator"; "Focus Timer" -> "timer"; "GPA Calculator" -> "gpa"
+                                "Notes" -> "notes"; "Converter" -> "converter"; "More Tools" -> "more"; else -> "home"
+                            }
+                        },
+                        onSettings = { screen = "settings" }, onAbout = { screen = "about" }
+                    )
+                }
+            }
+        }
+    }
 }
-@Composable private fun ToolCard(t:Tool,onClick:()->Unit){Card(onClick=onClick,Modifier.fillMaxWidth(),RoundedCornerShape(22.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceContainerHighest)){Column(Modifier.padding(16.dp)){Icon(t.icon,t.title,tint=Red,modifier=Modifier.size(30.dp));Spacer(Modifier.height(18.dp));Text(t.title,fontWeight=FontWeight.Bold);Spacer(Modifier.height(3.dp));Text(t.subtitle,style=MaterialTheme.typography.bodySmall)}}}
 
-@Composable private fun NotesScreen(onBack:()->Unit){val c=LocalContext.current;var notes by remember{mutableStateOf(NotesStore.load(c))};var query by remember{mutableStateOf("")};var edit by remember{mutableStateOf<Note?>(null)};var create by remember{mutableStateOf(false)};if(edit!=null||create){NoteEditor(edit,{edit=null;create=false}){n->notes=if(notes.any{it.id==n.id})notes.map{if(it.id==n.id)n else it}else notes+n;NotesStore.save(c,notes);edit=null;create=false};return};val filtered=notes.filter{query.isBlank()||it.title.contains(query,true)||it.content.contains(query,true)}.sortedWith(compareByDescending<Note>{it.pinned}.thenByDescending{it.id});Column(Modifier.fillMaxSize().padding(horizontal=18.dp)){Spacer(Modifier.height(28.dp));Row(Modifier.fillMaxWidth(),Alignment.CenterVertically){IconButton(onBack){Icon(Icons.Rounded.ArrowBack,"Back")};Text("Notes",style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold);Spacer(Modifier.weight(1f));IconButton({create=true}){Icon(Icons.Rounded.Add,"New note",tint=Red)}};OutlinedTextField(query,{query=it},Modifier.fillMaxWidth(),label={Text("Search notes")},singleLine=true,leadingIcon={Icon(Icons.Rounded.Search,null)});Spacer(Modifier.height(14.dp));if(filtered.isEmpty())Box(Modifier.fillMaxSize(),Alignment.Center){Column(horizontalAlignment=Alignment.CenterHorizontally){Icon(Icons.Rounded.EditNote,null,tint=Red,modifier=Modifier.size(48.dp));Text(if(notes.isEmpty())"No notes yet"else"No matching notes",fontWeight=FontWeight.Bold)}}else LazyColumn(verticalArrangement=Arrangement.spacedBy(10.dp),contentPadding=PaddingValues(bottom=24.dp)){items(filtered.size){i->val n=filtered[i];Card(onClick={edit=n},modifier=Modifier.fillMaxWidth(),shape=RoundedCornerShape(22.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceContainerHighest)){Column(Modifier.padding(16.dp)){Row(Modifier.fillMaxWidth(),Alignment.CenterVertically){Text(n.title.ifBlank{"Untitled"},Modifier.weight(1f),fontWeight=FontWeight.Bold);if(n.pinned)Icon(Icons.Rounded.PushPin,null,tint=Red);IconButton({notes=notes.filterNot{it.id==n.id};NotesStore.save(c,notes)}){Icon(Icons.Rounded.DeleteOutline,"Delete",tint=Red)}};if(n.content.isNotBlank())Text(n.content,maxLines=4)}}}}}}
-@Composable private fun NoteEditor(note:Note?,onCancel:()->Unit,onSave:(Note)->Unit){var title by remember{mutableStateOf(note?.title?:"")};var content by remember{mutableStateOf(note?.content?:"")};var pinned by remember{mutableStateOf(note?.pinned?:false)};Column(Modifier.fillMaxSize().padding(horizontal=18.dp)){Spacer(Modifier.height(28.dp));Row(Modifier.fillMaxWidth(),Alignment.CenterVertically){IconButton(onCancel){Icon(Icons.Rounded.ArrowBack,"Cancel")};Text(if(note==null)"New Note"else"Edit Note",style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold);Spacer(Modifier.weight(1f));TextButton({onSave(Note(note?.id?:System.currentTimeMillis(),title.trim(),content.trim(),pinned))},enabled=title.isNotBlank()||content.isNotBlank()){Text("Save",color=Red,fontWeight=FontWeight.Bold)}};Spacer(Modifier.height(16.dp));OutlinedTextField(title,{title=it},Modifier.fillMaxWidth(),label={Text("Title")},singleLine=true);Spacer(Modifier.height(12.dp));OutlinedTextField(content,{content=it},Modifier.fillMaxWidth().weight(1f),label={Text("Write your note…")});TextButton({pinned=!pinned}){Icon(Icons.Rounded.PushPin,null,tint=if(pinned)Red else MaterialTheme.colorScheme.onSurface);Spacer(Modifier.size(6.dp));Text(if(pinned)"Pinned"else"Pin note")}}}
-
-@Composable private fun UnitConverterScreen(onBack:()->Unit){val categories=listOf("Length","Weight","Temperature","Speed");var category by remember{mutableStateOf("Length")};var from by remember{mutableStateOf("Meter")};var to by remember{mutableStateOf("Kilometer")};var input by remember{mutableStateOf("")};val units=when(category){"Length"->listOf("Meter","Kilometer","Centimeter","Mile","Foot","Inch");"Weight"->listOf("Kilogram","Gram","Pound","Ounce");"Temperature"->listOf("Celsius","Fahrenheit","Kelvin");else->listOf("m/s","km/h","mph")};LaunchedEffect(category){from=units.first();to=units.getOrElse(1){units.first()};input=""};val result=convertValue(input.toDoubleOrNull(),category,from,to);Column(Modifier.fillMaxSize().padding(horizontal=18.dp)){Spacer(Modifier.height(28.dp));Row(Modifier.fillMaxWidth(),Alignment.CenterVertically){IconButton(onBack){Icon(Icons.Rounded.ArrowBack,"Back")};Column{Text("Unit Converter",style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold);Text("Simple, fast and offline.",style=MaterialTheme.typography.bodySmall)}};Spacer(Modifier.height(18.dp));LazyVerticalGrid(GridCells.Fixed(2),Modifier.fillMaxWidth().height(112.dp),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){items(categories){x->Card(onClick={category=x},Modifier.fillMaxWidth(),RoundedCornerShape(16.dp),colors=CardDefaults.cardColors(containerColor=if(category==x)Red else MaterialTheme.colorScheme.surfaceContainerHighest)){Box(Modifier.fillMaxWidth().padding(10.dp),Alignment.Center){Text(x,color=if(category==x)Color.White else MaterialTheme.colorScheme.onSurface,fontWeight=FontWeight.SemiBold)}}}};Spacer(Modifier.height(18.dp));OutlinedTextField(input,{input=it.filter{c->c.isDigit()||c=='.'||c=='-'}.take(15)},Modifier.fillMaxWidth(),label={Text("Value")},singleLine=true,keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal));Spacer(Modifier.height(12.dp));UnitSelector("From",from,units){from=it};Spacer(Modifier.height(10.dp));UnitSelector("To",to,units){to=it};Spacer(Modifier.height(18.dp));Card(Modifier.fillMaxWidth(),RoundedCornerShape(26.dp),colors=CardDefaults.cardColors(containerColor=Red)){Column(Modifier.padding(20.dp)){Text("Result",color=Color.White.copy(.85f));Text(result?.let(::formatResult)?:"—",color=Color.White,fontSize=34.sp,fontWeight=FontWeight.Black);if(result!=null)Text("$from → $to",color=Color.White.copy(.85f),style=MaterialTheme.typography.bodySmall)}}}}
-@Composable private fun UnitSelector(label:String,value:String,options:List<String>,onChange:(String)->Unit){var expanded by remember{mutableStateOf(false)};Box{OutlinedTextField(value,{ },Modifier.fillMaxWidth(),label={Text(label)},readOnly=true,trailingIcon={IconButton({expanded=true}){Icon(Icons.Rounded.ExpandMore,"Choose unit")}});DropdownMenu(expanded,{expanded=false}){options.forEach{DropdownMenuItem(text={Text(it)},onClick={onChange(it);expanded=false})}}}}
-private fun convertValue(v:Double?,cat:String,from:String,to:String):Double?{if(v==null)return null;if(from==to)return v;return when(cat){"Length"->lengthToM(v,from).let{mToLength(it,to)};"Weight"->weightToKg(v,from).let{kgToWeight(it,to)};"Temperature"->tempToC(v,from).let{cToTemp(it,to)};else->speedToMps(v,from).let{mpsToSpeed(it,to)}}}
-private fun lengthToM(v:Double,u:String)=when(u){"Kilometer"->v*1000;"Centimeter"->v/100;"Mile"->v*1609.344;"Foot"->v*.3048;"Inch"->v*.0254;else->v};private fun mToLength(v:Double,u:String)=when(u){"Kilometer"->v/1000;"Centimeter"->v*100;"Mile"->v/1609.344;"Foot"->v/.3048;"Inch"->v/.0254;else->v};private fun weightToKg(v:Double,u:String)=when(u){"Gram"->v/1000;"Pound"->v*.45359237;"Ounce"->v*.028349523125;else->v};private fun kgToWeight(v:Double,u:String)=when(u){"Gram"->v*1000;"Pound"->v/.45359237;"Ounce"->v/.028349523125;else->v};private fun tempToC(v:Double,u:String)=when(u){"Fahrenheit"->(v-32)*5/9;"Kelvin"->v-273.15;else->v};private fun cToTemp(v:Double,u:String)=when(u){"Fahrenheit"->v*9/5+32;"Kelvin"->v+273.15;else->v};private fun speedToMps(v:Double,u:String)=when(u){"km/h"->v/3.6;"mph"->v*.44704;else->v};private fun mpsToSpeed(v:Double,u:String)=when(u){"km/h"->v*3.6;"mph"->v/.44704;else->v};private fun formatResult(v:Double)=if(v==0.0)"0"else String.format(Locale.US,"%.6f",v).trimEnd('0').trimEnd('.')
-
-@Composable private fun GpaCalculatorScreen(onBack:()->Unit){var subjects by remember{mutableStateOf(listOf(Subject(1,"Mathematics","","3"),Subject(2,"English","","2"),Subject(3,"Science","","3")))};var nextId by remember{mutableStateOf(4)};var scale by remember{mutableStateOf(20)};fun update(id:Int,f:(Subject)->Subject){subjects=subjects.map{if(it.id==id)f(it)else it}};val valid=subjects.mapNotNull{val g=it.grade.replace(',','.').toDoubleOrNull();val c=it.credits.replace(',','.').toDoubleOrNull();if(g!=null&&c!=null&&c>0&&g in 0.0..scale.toDouble())g to c else null};val total=valid.sumOf{it.second};val avg=if(total>0)valid.sumOf{it.first*it.second}/total else null;val result=avg?.let{if(scale==20)it else it/5};Column(Modifier.fillMaxSize().padding(horizontal=18.dp)){Spacer(Modifier.height(28.dp));Row(Modifier.fillMaxWidth(),Alignment.CenterVertically){IconButton(onBack){Icon(Icons.Rounded.ArrowBack,"Back")};Text("GPA Calculator",style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold)};Spacer(Modifier.height(14.dp));Row(Modifier.fillMaxWidth(),Arrangement.spacedBy(8.dp)){listOf(20,4).forEach{v->Card(onClick={scale=v},Modifier.weight(1f),RoundedCornerShape(16.dp),colors=CardDefaults.cardColors(containerColor=if(scale==v)Red else MaterialTheme.colorScheme.surfaceContainerHighest)){Box(Modifier.fillMaxWidth().padding(11.dp),Alignment.Center){Text("$v-point",color=if(scale==v)Color.White else MaterialTheme.colorScheme.onSurface)}}}};Spacer(Modifier.height(14.dp));Card(Modifier.fillMaxWidth(),RoundedCornerShape(26.dp),colors=CardDefaults.cardColors(containerColor=Red)){Column(Modifier.fillMaxWidth().padding(18.dp),horizontalAlignment=Alignment.CenterHorizontally){Text("Your GPA",color=Color.White.copy(.85f));Text(result?.let{String.format(Locale.US,"%.2f",it)}?:"—",color=Color.White,fontSize=42.sp,fontWeight=FontWeight.Black)}};Row(Modifier.fillMaxWidth(),Arrangement.SpaceBetween,Alignment.CenterVertically){Text("Courses",fontWeight=FontWeight.Bold);TextButton({subjects=subjects+Subject(nextId,"New course","","3");nextId++}){Text("+ Add")}};LazyColumn(verticalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(bottom=24.dp)){items(subjects.size){i->val s=subjects[i];Card(Modifier.fillMaxWidth(),RoundedCornerShape(20.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceContainerHighest)){Column(Modifier.padding(12.dp)){Row(Modifier.fillMaxWidth(),Alignment.CenterVertically){OutlinedTextField(s.name,{v->update(s.id){it.copy(name=v)}},Modifier.weight(1f),label={Text("Course")},singleLine=true);IconButton({if(subjects.size>1)subjects=subjects.filterNot{it.id==s.id}}){Icon(Icons.Rounded.DeleteOutline,"Delete",tint=Red)}};Row(Modifier.fillMaxWidth(),Arrangement.spacedBy(8.dp)){OutlinedTextField(s.grade,{v->update(s.id){it.copy(grade=v)}},Modifier.weight(1f),label={Text("Grade")},singleLine=true,keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal));OutlinedTextField(s.credits,{v->update(s.id){it.copy(credits=v)}},Modifier.weight(1f),label={Text("Credits")},singleLine=true,keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal))}}}}}}
+@Composable
+private fun HomeScreen(onTool: (String) -> Unit, onSettings: () -> Unit, onAbout: () -> Unit) {
+    val context = LocalContext.current
+    var query by remember { mutableStateOf("") }
+    var favorites by remember { mutableStateOf(DashboardPreferences.favorites(context)) }
+    var recents by remember { mutableStateOf(DashboardPreferences.recents(context)) }
+    val visible = tools.filter { query.isBlank() || it.title.contains(query, true) || it.subtitle.contains(query, true) }
+    val favoriteTools = tools.filter { it.title in favorites }
+    Column(Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
+        Spacer(Modifier.height(24.dp))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(48.dp).background(Red, RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) { Text("R", color = Color.White, fontWeight = FontWeight.Black) }
+            Column(Modifier.padding(start = 12.dp).weight(1f)) {
+                Text("RedBox", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Text("Simple. Useful. Red.", style = MaterialTheme.typography.bodySmall)
+            }
+            IconButton(onClick = onAbout) { Icon(Icons.Rounded.Info, "About", tint = Red) }
+            IconButton(onClick = onSettings) { Icon(Icons.Rounded.Settings, "Settings", tint = Red) }
+        }
+        Spacer(Modifier.height(18.dp))
+        Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), colors = CardDefaults.cardColors(containerColor = Red)) {
+            Column(Modifier.padding(22.dp)) {
+                Text("Everything you need.", color = Color.White, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+                Text("One RedBox.", color = Color.White.copy(alpha = .9f), style = MaterialTheme.typography.titleMedium)
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+        OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), singleLine = true, label = { Text("Search tools") }, leadingIcon = { Icon(Icons.Rounded.Search, null) }, trailingIcon = { if (query.isNotBlank()) IconButton({ query = "" }) { Icon(Icons.Rounded.Close, "Clear") } })
+        if (query.isBlank() && favoriteTools.isNotEmpty()) {
+            Spacer(Modifier.height(18.dp)); SectionTitle("Favorites", Icons.Rounded.Star)
+            LazyVerticalGrid(GridCells.Adaptive(155.dp), Modifier.height(120.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                items(favoriteTools) { ToolCard(it, true, { onTool(it.title) }) { DashboardPreferences.toggleFavorite(context, it.title); favorites = DashboardPreferences.favorites(context) } }
+            }
+        }
+        if (query.isBlank() && recents.isNotEmpty()) {
+            Spacer(Modifier.height(14.dp)); SectionTitle("Recent", Icons.Rounded.History)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                recents.take(3).forEach { title -> AssistChip(onClick = { onTool(title) }, label = { Text(title) }, leadingIcon = { Icon(tools.first { it.title == title }.icon, null, Modifier.size(18.dp)) }) }
+            }
+        }
+        Spacer(Modifier.height(18.dp)); SectionTitle(if (query.isBlank()) "All Tools" else "Results", Icons.Rounded.GridView)
+        LazyVerticalGrid(GridCells.Adaptive(155.dp), Modifier.fillMaxWidth(), contentPadding = PaddingValues(bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(visible) { tool ->
+                ToolCard(tool, tool.title in favorites, { onTool(tool.title) }) {
+                    DashboardPreferences.toggleFavorite(context, tool.title)
+                    favorites = DashboardPreferences.favorites(context)
+                    recents = DashboardPreferences.recents(context)
+                }
+            }
+        }
+    }
 }
 
-@Composable private fun FocusTimerScreen(onBack:()->Unit){val c=LocalContext.current;val p=remember{c.getSharedPreferences(TIMER_PREFS,Context.MODE_PRIVATE)};var mode by remember{mutableStateOf(p.getString("mode","Focus")?:"Focus")};var minutes by remember{mutableStateOf(p.getInt("minutes",25))};var running by remember{mutableStateOf(p.getBoolean("running",false))};var remaining by remember{mutableLongStateOf(loadRemaining(p))};fun reset(){running=false;remaining=minutes*60000L;p.edit().putBoolean("running",false).putLong("remaining_ms",remaining).remove("end_at").apply();cancelTimer(c)};fun start(){val d=if(remaining>0)remaining else minutes*60000L;val end=System.currentTimeMillis()+d;remaining=d;running=true;p.edit().putBoolean("running",true).putLong("end_at",end).apply();scheduleTimer(c,end,mode)};LaunchedEffect(running){while(running){remaining=loadRemaining(p);if(remaining<=0){running=false;mode=if(mode=="Focus")"Break"else"Focus";minutes=if(mode=="Focus")25 else 5;p.edit().putBoolean("running",false).putString("mode",mode).putInt("minutes",minutes).remove("end_at").apply();break};delay(250)}};Column(Modifier.fillMaxSize().padding(horizontal=18.dp)){Spacer(Modifier.height(28.dp));Row(Modifier.fillMaxWidth(),Alignment.CenterVertically){IconButton(onBack){Icon(Icons.Rounded.ArrowBack,"Back")};Text("Focus Timer",style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold)};Spacer(Modifier.height(18.dp));Row(Modifier.fillMaxWidth(),Arrangement.spacedBy(8.dp)){listOf("Focus" to 25,"Break" to 5,"Custom" to minutes).forEach{(m,v)->Card(onClick={if(!running){mode=m;minutes=if(m=="Custom")minutes else v;remaining=minutes*60000L}},Modifier.weight(1f),RoundedCornerShape(16.dp),colors=CardDefaults.cardColors(containerColor=if(mode==m)Red else MaterialTheme.colorScheme.surfaceContainerHighest)){Box(Modifier.fillMaxWidth().padding(11.dp),Alignment.Center){Text(m,color=if(mode==m)Color.White else MaterialTheme.colorScheme.onSurface)}}}};Spacer(Modifier.height(20.dp));if(mode=="Custom"){OutlinedTextField(minutes.toString(),{minutes=it.filter(Char::isDigit).toIntOrNull()?.coerceIn(1,180)?:1},Modifier.fillMaxWidth(),label={Text("Minutes")},enabled=!running,singleLine=true);Spacer(Modifier.height(12.dp))};Card(Modifier.fillMaxWidth(),RoundedCornerShape(30.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceContainerHighest)){Column(Modifier.fillMaxWidth().padding(28.dp),horizontalAlignment=Alignment.CenterHorizontally){Text(mode,color=Red,fontWeight=FontWeight.Bold);Text(formatTime(remaining),fontSize=64.sp,fontWeight=FontWeight.Black);Text(if(running)"Running"else"Ready",style=MaterialTheme.typography.bodySmall)}};Spacer(Modifier.height(18.dp));Row(Modifier.fillMaxWidth(),Arrangement.spacedBy(10.dp)){Button({if(running){running=false;remaining=loadRemaining(p);p.edit().putBoolean("running",false).putLong("remaining_ms",remaining).remove("end_at").apply();cancelTimer(c)}else start()},Modifier.weight(1f).height(56.dp)){Icon(if(running)Icons.Rounded.Pause else Icons.Rounded.PlayArrow,null);Spacer(Modifier.size(8.dp));Text(if(running)"Pause"else"Start")};IconButton({reset()}){Icon(Icons.Rounded.RestartAlt,"Reset",tint=Red)}}}}
-@Composable private fun CalculatorScreen(onBack:()->Unit){var d by remember{mutableStateOf("0")};var stored by remember{mutableStateOf<Double?>(null)};var op by remember{mutableStateOf<String?>(null)};var fresh by remember{mutableStateOf(true)};fun input(v:String){if(fresh||d=="0"){d=v;fresh=false}else d+=v};fun clear(){d="0";stored=null;op=null;fresh=true};fun calc(){val a=stored?:return;val b=d.toDoubleOrNull()?:return;val r=when(op){"+"->a+b;"−"->a-b;"×"->a*b;"÷"->if(b==0.0)null else a/b;else->b};d=r?.let(::formatNumber)?:"Error";stored=null;op=null;fresh=true};fun setOp(o:String){stored=d.toDoubleOrNull()?:return;op=o;fresh=true};Column(Modifier.fillMaxSize().padding(horizontal=18.dp)){Spacer(Modifier.height(28.dp));Row(Modifier.fillMaxWidth(),Alignment.CenterVertically){IconButton(onBack){Icon(Icons.Rounded.ArrowBack,"Back")};Text("Calculator",style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold)};Spacer(Modifier.height(22.dp));Card(Modifier.fillMaxWidth(),RoundedCornerShape(26.dp),colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceContainerHighest)){Text(d,Modifier.fillMaxWidth().padding(22.dp),textAlign=TextAlign.End,fontSize=40.sp,fontWeight=FontWeight.Bold)};Spacer(Modifier.height(16.dp));listOf(listOf("C","÷","×","⌫"),listOf("7","8","9","−"),listOf("4","5","6","+"),listOf("1","2","3","="),listOf("0",".")).forEach{row->Row(Modifier.fillMaxWidth().padding(vertical=5.dp),Arrangement.spacedBy(10.dp)){row.forEach{k->Card(onClick={when(k){"C"->clear();"⌫"->if(!fresh&&d.length>1)d=d.dropLast(1);"."->if(!d.contains('.'))input(".");"+","−","×","÷"->setOp(k);"="->calc();else->input(k)}},Modifier.weight(if(k=="0")2f else 1f).height(64.dp),RoundedCornerShape(18.dp),colors=CardDefaults.cardColors(containerColor=if(k in listOf("+","−","×","÷","="))Red else MaterialTheme.colorScheme.surfaceContainerHighest)){Box(Modifier.fillMaxSize(),Alignment.Center){Text(k,color=if(k in listOf("+","−","×","÷","="))Color.White else MaterialTheme.colorScheme.onSurface,fontSize=21.sp)}}}}}}
+@Composable private fun SectionTitle(title: String, icon: ImageVector) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, tint = Red, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) }
 }
-private fun formatTime(ms:Long):String{val s=(ms.coerceAtLeast(0)+999)/1000;return String.format(Locale.US,"%02d:%02d",s/60,s%60)}
-private fun loadRemaining(p:android.content.SharedPreferences):Long=if(p.getBoolean("running",false))(p.getLong("end_at",0)-System.currentTimeMillis()).coerceAtLeast(0)else p.getLong("remaining_ms",25*60000L)
-private fun scheduleTimer(c:Context,end:Long,mode:String){val a=c.getSystemService(Context.ALARM_SERVICE)as AlarmManager;val i=Intent(c,FocusTimerReceiver::class.java).putExtra("mode",mode);val pi=PendingIntent.getBroadcast(c,ALARM_REQUEST,i,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE);a.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,end,pi)}
-private fun cancelTimer(c:Context){val a=c.getSystemService(Context.ALARM_SERVICE)as AlarmManager;val i=Intent(c,FocusTimerReceiver::class.java);val pi=PendingIntent.getBroadcast(c,ALARM_REQUEST,i,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE);a.cancel(pi)}
+
+@Composable private fun ToolCard(tool: Tool, favorite: Boolean, onClick: () -> Unit, onFavorite: () -> Unit) {
+    Card(onClick = onClick, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest)) {
+        Column(Modifier.padding(16.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Icon(tool.icon, null, tint = Red, modifier = Modifier.size(30.dp)); Spacer(Modifier.weight(1f)); IconButton(onFavorite, Modifier.size(32.dp)) { Icon(if (favorite) Icons.Rounded.Star else Icons.Rounded.StarBorder, "Favorite", tint = if (favorite) Red else MaterialTheme.colorScheme.onSurfaceVariant) }
+            }
+            Spacer(Modifier.height(8.dp)); Text(tool.title, fontWeight = FontWeight.Bold); Spacer(Modifier.height(3.dp)); Text(tool.subtitle, style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable private fun CalculatorScreen(onBack: () -> Unit) {
+    var display by remember { mutableStateOf("0") }; var stored by remember { mutableStateOf<Double?>(null) }; var op by remember { mutableStateOf<String?>(null) }; var fresh by remember { mutableStateOf(true) }
+    fun input(v: String) { display = if (fresh || display == "0") v else display + v; fresh = false }
+    fun clear() { display = "0"; stored = null; op = null; fresh = true }
+    fun calculate() { val a = stored ?: return; val b = display.toDoubleOrNull() ?: return; val r = when (op) { "+" -> a + b; "−" -> a - b; "×" -> a * b; "÷" -> if (b == 0.0) null else a / b; else -> b }; display = r?.let(::formatNumber) ?: "Error"; stored = null; op = null; fresh = true }
+    fun setOp(o: String) { stored = display.toDoubleOrNull(); op = o; fresh = true }
+    ToolPage("Calculator", onBack) {
+        Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest)) { Text(display, Modifier.fillMaxWidth().padding(22.dp), textAlign = TextAlign.End, fontSize = 40.sp, fontWeight = FontWeight.Bold) }
+        Spacer(Modifier.height(14.dp))
+        listOf(listOf("C","÷","×","⌫"), listOf("7","8","9","−"), listOf("4","5","6","+"), listOf("1","2","3","="), listOf("0",".")).forEach { row ->
+            Row(Modifier.fillMaxWidth().padding(vertical = 5.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) { row.forEach { key ->
+                Card(onClick = { when (key) { "C" -> clear(); "⌫" -> if (!fresh && display.length > 1) display = display.dropLast(1); "." -> if (!display.contains('.')) input("."); "+","−","×","÷" -> setOp(key); "=" -> calculate(); else -> input(key) } }, modifier = Modifier.weight(if (key == "0") 2f else 1f).height(62.dp), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = if (key in listOf("+","−","×","÷","=")) Red else MaterialTheme.colorScheme.surfaceContainerHighest)) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(key, color = if (key in listOf("+","−","×","÷","=")) Color.White else MaterialTheme.colorScheme.onSurface, fontSize = 20.sp) } }
+            } }
+        }
+    }
+}
+
+@Composable private fun FocusTimerScreen(onBack: () -> Unit) {
+    val context = LocalContext.current; val prefs = remember { context.getSharedPreferences(TIMER_PREFS, Context.MODE_PRIVATE) }; var minutes by remember { mutableIntStateOf(prefs.getInt("minutes", 25)) }; var running by remember { mutableStateOf(false) }; var remaining by remember { mutableLongStateOf(minutes * 60000L) }
+    LaunchedEffect(running) { while (running) { delay(250); remaining = (remaining - 250).coerceAtLeast(0); if (remaining == 0L) running = false } }
+    ToolPage("Focus Timer", onBack) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf(25,5).forEach { m -> FilterChip(selected = minutes == m && !running, onClick = { if (!running) { minutes = m; remaining = m * 60000L } }, label = { Text("$m min") }) } }
+        Spacer(Modifier.height(18.dp)); Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(30.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest)) { Column(Modifier.fillMaxWidth().padding(30.dp), horizontalAlignment = Alignment.CenterHorizontally) { Text("Focus", color = Red, fontWeight = FontWeight.Bold); Text(formatTime(remaining), fontSize = 64.sp, fontWeight = FontWeight.Black); Text(if (running) "Running" else "Ready", style = MaterialTheme.typography.bodySmall) } }
+        Spacer(Modifier.height(18.dp)); Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) { Button({ running = !running }, Modifier.weight(1f).height(54.dp)) { Icon(if (running) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, null); Spacer(Modifier.width(8.dp)); Text(if (running) "Pause" else "Start") }; OutlinedButton({ running = false; remaining = minutes * 60000L }, Modifier.height(54.dp)) { Text("Reset") } }
+    }
+}
+
+@Composable private fun GpaCalculatorScreen(onBack: () -> Unit) {
+    var subjects by remember { mutableStateOf(listOf(Subject(1,"Mathematics","","3"),Subject(2,"English","","2"),Subject(3,"Science","","3"))) }; var nextId by remember { mutableIntStateOf(4) }
+    val valid = subjects.mapNotNull { s -> val g=s.grade.replace(',','.').toDoubleOrNull(); val c=s.credits.replace(',','.').toDoubleOrNull(); if (g != null && c != null && c > 0 && g in 0.0..20.0) g to c else null }; val total=valid.sumOf{it.second}; val avg=if(total>0) valid.sumOf{it.first*it.second}/total else null
+    ToolPage("GPA Calculator", onBack) {
+        Card(Modifier.fillMaxWidth(), shape=RoundedCornerShape(26.dp), colors=CardDefaults.cardColors(containerColor=Red)) { Column(Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment=Alignment.CenterHorizontally) { Text("Your GPA", color=Color.White.copy(.85f)); Text(avg?.let{String.format(Locale.US,"%.2f",it)} ?: "—", color=Color.White, fontSize=42.sp, fontWeight=FontWeight.Black) } }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement=Arrangement.SpaceBetween, verticalAlignment=Alignment.CenterVertically) { Text("Courses", fontWeight=FontWeight.Bold); TextButton({ subjects += Subject(nextId,"New course","","3"); nextId++ }) { Text("+ Add") } }
+        LazyColumn(verticalArrangement=Arrangement.spacedBy(8.dp), contentPadding=PaddingValues(bottom=24.dp)) { items(subjects.size) { i -> val s=subjects[i]; Card(Modifier.fillMaxWidth(), shape=RoundedCornerShape(20.dp), colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surfaceContainerHighest)) { Column(Modifier.padding(12.dp)) { OutlinedTextField(s.name,{v->subjects=subjects.map{if(it.id==s.id)it.copy(name=v)else it}},Modifier.fillMaxWidth(),label={Text("Course")},singleLine=true); Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)) { OutlinedTextField(s.grade,{v->subjects=subjects.map{if(it.id==s.id)it.copy(grade=v)else it}},Modifier.weight(1f),label={Text("Grade")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal),singleLine=true); OutlinedTextField(s.credits,{v->subjects=subjects.map{if(it.id==s.id)it.copy(credits=v)else it}},Modifier.weight(1f),label={Text("Credits")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal),singleLine=true) } } } } }
+    }
+}
+
+@Composable private fun UnitConverterScreen(onBack:()->Unit) {
+    val categories=listOf("Length","Weight","Temperature","Speed"); var category by remember{mutableStateOf("Length")}; var from by remember{mutableStateOf("Meter")}; var to by remember{mutableStateOf("Kilometer")}; var input by remember{mutableStateOf("")}; val units=when(category){"Length"->listOf("Meter","Kilometer","Centimeter","Mile","Foot","Inch");"Weight"->listOf("Kilogram","Gram","Pound","Ounce");"Temperature"->listOf("Celsius","Fahrenheit","Kelvin");else->listOf("m/s","km/h","mph")}; LaunchedEffect(category){from=units.first();to=units.getOrElse(1){units.first()};input=""}; val result=convertValue(input.toDoubleOrNull(),category,from,to)
+    ToolPage("Unit Converter",onBack){ Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)){categories.forEach{x->FilterChip(x==category,{category=x},label={Text(x)})}}; Spacer(Modifier.height(12.dp)); OutlinedTextField(input,{input=it.filter{c->c.isDigit()||c=='.'||c=='-'}.take(15)},Modifier.fillMaxWidth(),label={Text("Value")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal),singleLine=true); Spacer(Modifier.height(10.dp)); UnitSelector("From",from,units){from=it}; Spacer(Modifier.height(8.dp)); UnitSelector("To",to,units){to=it}; Spacer(Modifier.height(14.dp)); Card(Modifier.fillMaxWidth(),shape=RoundedCornerShape(26.dp),colors=CardDefaults.cardColors(containerColor=Red)){Column(Modifier.padding(20.dp)){Text("Result",color=Color.White.copy(.85f));Text(result?.let(::formatResult)?:"—",color=Color.White,fontSize=34.sp,fontWeight=FontWeight.Black)}} }
+}
+@Composable private fun UnitSelector(label:String,value:String,options:List<String>,onChange:(String)->Unit){var expanded by remember{mutableStateOf(false)};Box{OutlinedTextField(value,{ },Modifier.fillMaxWidth(),label={Text(label)},readOnly=true,trailingIcon={IconButton({expanded=true}){Icon(Icons.Rounded.ExpandMore,"Choose")}});DropdownMenu(expanded,{expanded=false}){options.forEach{DropdownMenuItem(text={Text(it)},onClick={onChange(it);expanded=false})}}}}
+private fun convertValue(v:Double?,cat:String,from:String,to:String):Double?{if(v==null)return null;return when(cat){"Length"->length(from,v).let{length(to,it)};"Weight"->weight(from,v).let{weight(to,it)};"Temperature"->temp(from,v).let{temp(to,it)};else->speed(from,v).let{speed(to,it)}}}
+private fun length(u:String,v:Double)=when(u){"Kilometer"->v*1000;"Centimeter"->v/100;"Mile"->v*1609.344;"Foot"->v*.3048;"Inch"->v*.0254;else->v};private fun weight(u:String,v:Double)=when(u){"Gram"->v/1000;"Pound"->v*.45359237;"Ounce"->v*.028349523125;else->v};private fun temp(u:String,v:Double)=when(u){"Fahrenheit"->v*9/5+32;"Kelvin"->v+273.15;else->v};private fun speed(u:String,v:Double)=when(u){"km/h"->v*3.6;"mph"->v/.44704;else->v};private fun tempToC(u:String,v:Double)=when(u){"Fahrenheit"->(v-32)*5/9;"Kelvin"->v-273.15;else->v};private fun temp(u:String,v:Double,c:Boolean)=if(c)tempToC(u,v)else temp(u,v);private fun length(u:String,v:Double,c:Boolean)=if(c)v else length(u,v);private fun weight(u:String,v:Double,c:Boolean)=if(c)v else weight(u,v);private fun speed(u:String,v:Double,c:Boolean)=if(c)v else speed(u,v)
+
+@Composable private fun ToolPage(title:String,onBack:()->Unit,content:@Composable ColumnScope.()->Unit){Column(Modifier.fillMaxSize().padding(horizontal=18.dp)){Spacer(Modifier.height(24.dp));Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically){IconButton(onBack){Icon(Icons.Rounded.ArrowBack,"Back")};Text(title,style=MaterialTheme.typography.headlineSmall,fontWeight=FontWeight.Bold)};Spacer(Modifier.height(14.dp));Column(Modifier.fillMaxWidth(),content=content)}}
 private fun formatNumber(v:Double)=if(v%1.0==0.0)v.toLong().toString()else v.toString().trimEnd('0').trimEnd('.')
+private fun formatTime(ms:Long):String{val s=(ms.coerceAtLeast(0)+999)/1000;return String.format(Locale.US,"%02d:%02d",s/60,s%60)}
