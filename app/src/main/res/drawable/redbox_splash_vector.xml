@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="432dp"
+    android:height="432dp"
+    android:viewportWidth="432"
+    android:viewportHeight="432">
+    <group
+        android:name="logoGroup"
+        android:pivotX="216"
+        android:pivotY="216"
+        android:scaleX="0.78"
+        android:scaleY="0.78">
+        <path
+            android:fillColor="#E53935"
+            android:pathData="M128,104 L250,104 C302,104 334,130 334,172 C334,202 318,223 289,235 L344,290 L289,290 L242,245 L178,245 L178,290 L128,290 Z M178,143 L178,207 L241,207 C267,207 283,195 283,174 C283,153 267,143 241,143 Z" />
+        <path
+            android:fillColor="#E53935"
+            android:pathData="M178,290 L224,290 L288,344 L240,344 Z" />
+    </group>
+    <path
+        android:name="lightBeam"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="9"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:alpha="0"
+        android:pathData="M104,118 C145,82 190,64 244,64 C302,64 353,84 391,119" />
+</vector>
