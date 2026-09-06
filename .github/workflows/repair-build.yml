@@ -35,8 +35,8 @@ jobs:
 
           patch('app/src/main/java/ir/redlighte/redbox/MainActivity.kt', [
               ('import androidx.compose.ui.unit.LocalLayoutDirection\n', 'import androidx.compose.ui.platform.LocalLayoutDirection\n'),
+              ('import androidx.compose.runtime.CompositionLocalProvider\n', ''),
               ('import androidx.compose.ui.platform.LocalContext\n', 'import androidx.compose.ui.platform.LocalContext\nimport androidx.compose.runtime.CompositionLocalProvider\n'),
-              ('import androidx.compose.runtime.CompositionLocalProvider\nimport androidx.compose.runtime.CompositionLocalProvider\n', 'import androidx.compose.runtime.CompositionLocalProvider\n'),
           ])
 
           for path in [
@@ -47,13 +47,11 @@ jobs:
           ]:
               p = Path(path)
               s = p.read_text(encoding='utf-8')
-              # Named arguments must not be followed by positional arguments.
               s = re.sub(r'tint=([^,\)]+),Modifier\.', r'tint=\1,modifier=Modifier.', s)
               s = re.sub(r'tint=([^,\)]+), Modifier\.', r'tint=\1, modifier = Modifier.', s)
               s = re.sub(r'fontWeight=([^,\)]+),Modifier\.', r'fontWeight=\1,modifier=Modifier.', s)
               p.write_text(s, encoding='utf-8')
 
-          # Fix common Material3 Card positional-shape mistakes introduced by the rounded UI pass.
           for path in [
               'app/src/main/java/ir/redlighte/redbox/MainActivity.kt',
               'app/src/main/java/ir/redlighte/redbox/NotesScreen.kt',
@@ -66,16 +64,13 @@ jobs:
               s = re.sub(r'Card\(onClick=([^,]+),(Modifier\.fillMaxWidth\(\)),(RoundedCornerShape\([^\n\)]*\))', r'Card(onClick=\1,modifier=\2,shape=\3', s)
               p.write_text(s, encoding='utf-8')
 
-          # MainActivity has a few very compact Card calls whose shape is positional.
-          p = Path('app/src/main/java/ir/redlighte/redbox/MainActivity.kt')
-          s = p.read_text(encoding='utf-8')
-          s = re.sub(r'Card\((Modifier\.fillMaxWidth\(\)),(RoundedCornerShape\([^\n\)]*\))', r'Card(modifier=\1,shape=\2', s)
-          p.write_text(s, encoding='utf-8')
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
 
       - name: Build debug APK
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: :app:assembleDebug --no-daemon
+        run: gradle :app:assembleDebug --no-daemon
 
       - name: Commit repaired sources
         shell: bash
