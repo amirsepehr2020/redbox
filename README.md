@@ -4,7 +4,7 @@
 
 RedBox is a modern, offline-first Android toolbox for school, study, and everyday life.
 
-## v0.7.0
+## v0.8.0
 
 The toolbox now includes:
 
@@ -14,6 +14,9 @@ The toolbox now includes:
 - 📝 **Notes** — create, edit, delete, search, pin, and offline persistence
 - 🔄 **Unit Converter** — length, weight, temperature, and speed conversions
 - 🧰 **More Tools** — percentage calculator, discount calculator, number-base converter, age calculator, and countdown
+- ⚙️ **Settings** — persistent Light/Dark theme preference
+- ℹ️ **About RedBox** — product information and version details
+- ✨ **Polished navigation** — smooth page transitions and a responsive adaptive tool grid
 
 ## Stack
 
