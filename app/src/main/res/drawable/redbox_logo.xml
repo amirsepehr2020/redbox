@@ -1,6 +1,6 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="512dp" android:height="512dp" android:viewportWidth="512" android:viewportHeight="512">
-    <path android:fillColor="#120606" android:pathData="M166,34 L346,34 A132,132 0,0 1,478 166 L478,346 A132,132 0,0 1,346 478 L166,478 A132,132 0,0 1,34 346 L34,166 A132,132 0,0 1,166 34Z"/>
-    <path android:strokeColor="#E53935" android:strokeWidth="28" android:strokeLineCap="round" android:fillColor="@android:color/transparent" android:pathData="M166,68 L346,68 A98,98 0,0 1,444 166 L444,346 A98,98 0,0 1,346 444 L166,444 A98,98 0,0 1,68 346 L68,166 A98,98 0,0 1,166 68Z"/>
-    <path android:fillColor="#E53935" android:pathData="M154,142 L272,142 C333,142 373,173 373,224 C373,262 350,289 313,301 L385,370 L313,370 L252,310 L210,310 L210,370 L154,370 Z M210,190 L210,262 L267,262 C298,262 317,250 317,226 C317,202 298,190 267,190 Z"/>
-    <path android:strokeColor="#FFFFFF" android:strokeWidth="10" android:strokeLineCap="round" android:fillColor="@android:color/transparent" android:alpha="0.72" android:pathData="M104,116 C152,77 206,58 265,58 C340,58 408,87 459,138"/>
+    <path android:fillColor="#0D0D12" android:pathData="M172,24 L340,24 A148,148 0,0 1,488 172 L488,340 A148,148 0,0 1,340 488 L172,488 A148,148 0,0 1,24 340 L24,172 A148,148 0,0 1,172 24Z"/>
+    <path android:fillColor="#FF3B30" android:pathData="M125,89 L321,89 C385,89 431,127 431,185 C431,226 408,258 370,274 L441,345 L380,345 L319,286 L244,286 L244,400 L125,400 Z M244,150 L244,225 L316,225 C346,225 362,213 362,187 C362,163 346,150 316,150 Z"/>
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="9" android:strokeLineCap="round" android:fillColor="@android:color/transparent" android:alpha="0.92" android:pathData="M92,150 C158,78 259,56 347,74 C385,82 417,96 447,117"/>
+    <path android:strokeColor="#FF3B30" android:strokeWidth="4" android:strokeLineCap="round" android:fillColor="@android:color/transparent" android:alpha="0.72" android:pathData="M111,129 C185,68 282,59 369,82"/>
 </vector>
