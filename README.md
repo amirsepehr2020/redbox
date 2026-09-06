@@ -4,16 +4,25 @@
 
 RedBox is a modern, offline-first Android toolbox for school, study, and everyday life.
 
-## v0.2.0
+## v0.3.0
 
-The first functional tool is now live:
+The second functional tool is now live:
 
 - 🧮 **Calculator** — arithmetic operations, decimals, clear, backspace, and divide-by-zero handling
-- ⏱️ Focus Timer — coming next
+- ⏱️ **Focus Timer** — Pomodoro Focus/Break modes, custom durations, Start/Pause/Reset, presets, and background-safe completion notifications
 - 📊 GPA Calculator — coming next
 - 📝 Notes — coming next
 - 🔄 Unit Converter — coming next
 - 🧰 More Tools — coming later
+
+### Focus Timer
+
+- 🍅 Default Pomodoro: **25 min Focus / 5 min Break**
+- ⚙️ Custom timer from **1–180 minutes**
+- ▶️ Start / ⏸️ Pause / 🔄 Reset
+- 🔔 Completion notification with system notification sound
+- 🌙 Uses a timestamp-based background alarm so the timer remains meaningful when the app is not on screen
+- 💾 Timer state is stored locally on the device
 
 ## Stack
 
