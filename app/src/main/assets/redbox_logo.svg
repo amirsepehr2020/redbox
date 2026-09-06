@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="redbox" x1="72" y1="56" x2="444" y2="456" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF4B47"/>
+      <stop offset="0.55" stop-color="#E53935"/>
+      <stop offset="1" stop-color="#B71C1C"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="110" y1="90" x2="420" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.12"/>
+    </linearGradient>
+  </defs>
+  <rect x="34" y="34" width="444" height="444" rx="132" fill="#120606"/>
+  <rect x="54" y="54" width="404" height="404" rx="112" stroke="url(#redbox)" stroke-width="28"/>
+  <path d="M154 142h118c61 0 101 31 101 82 0 38-23 65-60 77l72 69h-72l-61-60h-42v60h-56V142Zm56 48v72h57c31 0 50-12 50-36 0-24-19-36-50-36h-57Z" fill="url(#redbox)"/>
+  <path d="M104 116c48-39 102-58 161-58 75 0 143 29 194 80" stroke="url(#shine)" stroke-width="10" stroke-linecap="round" opacity="0.7"/>
+  <path d="M108 394c45 36 98 55 157 55 76 0 145-29 196-80" stroke="#FF6B67" stroke-width="7" stroke-linecap="round" opacity="0.35"/>
+</svg>
