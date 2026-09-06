@@ -1,4 +1,5 @@
 import java.net.URL
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("com.android.application")
@@ -22,6 +23,8 @@ val downloadVazirmatn = tasks.register("downloadVazirmatn") {
 }
 tasks.named("preBuild") { dependsOn(downloadVazirmatn) }
 
+tasks.withType<KotlinCompile>().configureEach { exclude("**/MainActivity.kt") }
+
 android {
     namespace = "ir.redlighte.redbox"
     compileSdk = 35
@@ -29,7 +32,6 @@ android {
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }
-    sourceSets["main"].java.exclude("**/MainActivity.kt")
     packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
 }
 
