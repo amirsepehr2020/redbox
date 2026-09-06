@@ -1,5 +1,6 @@
 package ir.redlighte.redbox
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,10 +43,15 @@ fun AboutScreen(onBack: () -> Unit) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(30.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFE53935))
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF120606))
         ) {
             Column(Modifier.fillMaxWidth().padding(28.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("R", color = Color.White, fontSize = 56.sp, fontWeight = FontWeight.Black)
+                Image(
+                    painter = painterResource(R.drawable.redbox_logo),
+                    contentDescription = "RedBox logo",
+                    modifier = Modifier.size(110.dp)
+                )
+                Spacer(Modifier.size(10.dp))
                 Text("RedBox", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Black)
                 Text("Everything you need. One RedBox.", color = Color.White.copy(alpha = .9f))
             }
@@ -64,7 +71,7 @@ fun AboutScreen(onBack: () -> Unit) {
         ) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text("Version", style = MaterialTheme.typography.labelLarge)
-                Text("0.8.0", fontWeight = FontWeight.Bold)
+                Text("0.9.0", fontWeight = FontWeight.Bold)
                 Text("A Redlighte product", style = MaterialTheme.typography.bodySmall)
             }
         }
