@@ -4,16 +4,16 @@
 
 RedBox is a modern, offline-first Android toolbox for school, study, and everyday life.
 
-## v0.4.0
+## v0.6.0
 
-Three core tools are now functional:
+Five core tools are now available:
 
 - 🧮 **Calculator** — arithmetic operations, decimals, clear, backspace, and divide-by-zero handling
-- ⏱️ **Focus Timer** — Pomodoro, focus/break modes, custom durations, pause/reset, background-safe countdown, and completion notification
+- ⏱️ **Focus Timer** — Pomodoro, focus/break modes, custom durations, pause/reset, background-safe countdown, and completion scheduling
 - 📊 **GPA Calculator** — course list, grades, credits, weighted average, add/remove courses, and 20-point / 4-point scales
-- 📝 Notes — coming next
-- 🔄 Unit Converter — coming next
-- 🧰 More Tools — coming later
+- 📝 **Notes** — create, edit, delete, search, pin, and offline persistence
+- 🔄 **Unit Converter** — length, weight, temperature, and speed conversions
+- 🧰 **More Tools** — coming later
 
 ## Stack
 
