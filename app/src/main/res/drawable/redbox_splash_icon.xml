@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/redbox_splash_vector">
+    <target
+        android:name="logoGroup"
+        android:animation="@animator/redbox_splash_scale" />
+    <target
+        android:name="lightBeam"
+        android:animation="@animator/redbox_splash_beam" />
+</animated-vector>
