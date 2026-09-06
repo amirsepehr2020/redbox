@@ -8,7 +8,7 @@
         android:label="RedBox"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.RedBox">
+        android:theme="@style/Theme.RedBox.Starting">
         <activity
             android:name=".MainActivity"
             android:exported="true">
