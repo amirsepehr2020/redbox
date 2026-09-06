@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">RedBox logo</title>
+  <desc id="desc">A geometric RedBox monogram inspired by a red light beam.</desc>
+  <defs>
+    <linearGradient id="red" x1="180" y1="140" x2="820" y2="880" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF4B4B"/>
+      <stop offset="1" stop-color="#D71920"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="170" y1="320" x2="850" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".45" stop-color="#fff" stop-opacity=".92"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="48" y="48" width="928" height="928" rx="248" fill="#0D0D12"/>
+  <path d="M250 178h392c128 0 220 76 220 191 0 82-47 142-123 169l151 153H735L603 560H448v131H250V178Zm198 157v69h170c45 0 67-14 67-39s-22-30-67-30H448Z" fill="url(#red)" fill-rule="evenodd"/>
+  <path d="M448 691h-198V353h198v338Z" fill="url(#red)"/>
+  <path d="M176 318C314 168 510 119 681 157c73 16 130 43 178 79" fill="none" stroke="url(#beam)" stroke-width="22" stroke-linecap="round"/>
+  <path d="M215 273C360 155 540 130 704 177" fill="none" stroke="#FF3B30" stroke-width="8" stroke-linecap="round" opacity=".72"/>
+</svg>
