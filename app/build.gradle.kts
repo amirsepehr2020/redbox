@@ -1,8 +1,29 @@
+import java.net.URL
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
+
+val downloadVazirmatn = tasks.register("downloadVazirmatn") {
+    doLast {
+        val fontDir = file("$projectDir/src/main/res/font")
+        fontDir.mkdirs()
+        val fonts = mapOf(
+            "vazirmatn_regular.ttf" to "https://github.com/rastikerdar/vazirmatn/raw/master/fonts/ttf/Vazirmatn-Regular.ttf",
+            "vazirmatn_bold.ttf" to "https://github.com/rastikerdar/vazirmatn/raw/master/fonts/ttf/Vazirmatn-Bold.ttf"
+        )
+        fonts.forEach { (name, url) ->
+            val target = file("$fontDir/$name")
+            if (!target.exists() || target.length() < 1000) {
+                URL(url).openStream().use { input -> target.outputStream().use { output -> input.copyTo(output) } }
+            }
+        }
+    }
+}
+
+tasks.named("preBuild") { dependsOn(downloadVazirmatn) }
 
 android {
     namespace = "ir.redlighte.redbox"
@@ -12,8 +33,8 @@ android {
         applicationId = "ir.redlighte.redbox"
         minSdk = 26
         targetSdk = 35
-        versionCode = 10
-        versionName = "0.10.0"
+        versionCode = 11
+        versionName = "0.11.0"
     }
 
     compileOptions {
