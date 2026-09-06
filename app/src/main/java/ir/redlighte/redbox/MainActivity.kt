@@ -108,7 +108,8 @@ private fun RedBoxApp() {
                 "calculator" -> CalculatorScreen(onBack = { screen = "home" })
                 "timer" -> FocusTimerScreen(onBack = { screen = "home" })
                 "gpa" -> GpaCalculatorScreen(onBack = { screen = "home" })
-                else -> HomeScreen(onToolClick = { screen = when (it) { "Calculator" -> "calculator"; "Focus Timer" -> "timer"; "GPA Calculator" -> "gpa"; else -> "home" } })
+                "notes" -> NotesScreen(onBack = { screen = "home" })
+                else -> HomeScreen(onToolClick = { screen = when (it) { "Calculator" -> "calculator"; "Focus Timer" -> "timer"; "GPA Calculator" -> "gpa"; "Notes" -> "notes"; else -> "home" } })
             }
         }
     }
@@ -136,7 +137,7 @@ private fun HomeScreen(onToolClick: (String) -> Unit) {
         Spacer(Modifier.height(24.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text("Quick Tools", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text("v0.4.0", style = MaterialTheme.typography.labelMedium, color = Red)
+            Text("v0.5.0", style = MaterialTheme.typography.labelMedium, color = Red)
         }
         Spacer(Modifier.height(12.dp))
         LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(bottom = 28.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -163,7 +164,6 @@ private fun GpaCalculatorScreen(onBack: () -> Unit) {
     var subjects by remember { mutableStateOf(listOf(Subject(1, "Mathematics", "", "3"), Subject(2, "English", "", "2"), Subject(3, "Science", "", "3"))) }
     var nextId by remember { mutableStateOf(4) }
     var scale by remember { mutableStateOf(20) }
-
     fun updateSubject(id: Int, transform: (Subject) -> Subject) { subjects = subjects.map { if (it.id == id) transform(it) else it } }
     val validSubjects = subjects.mapNotNull { subject ->
         val grade = subject.grade.replace(',', '.').toDoubleOrNull()
@@ -173,15 +173,11 @@ private fun GpaCalculatorScreen(onBack: () -> Unit) {
     val totalCredits = validSubjects.sumOf { it.second }
     val weightedAverage = if (totalCredits > 0.0) validSubjects.sumOf { it.first * it.second } / totalCredits else null
     val result = weightedAverage?.let { if (scale == 20) it else it / 5.0 }
-
     Column(modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp)) {
         Spacer(Modifier.height(28.dp))
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.Rounded.ArrowBack, contentDescription = "Back") }
-            Column(modifier = Modifier.padding(start = 4.dp)) {
-                Text("GPA Calculator", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Text("Weighted by course credits.", style = MaterialTheme.typography.bodySmall)
-            }
+            Column(modifier = Modifier.padding(start = 4.dp)) { Text("GPA Calculator", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold); Text("Weighted by course credits.", style = MaterialTheme.typography.bodySmall) }
         }
         Spacer(Modifier.height(18.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -203,9 +199,7 @@ private fun GpaCalculatorScreen(onBack: () -> Unit) {
         Spacer(Modifier.height(16.dp))
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             Text("Courses", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            TextButton(onClick = { subjects = subjects + Subject(nextId, "New course", "", "3"); nextId += 1 }) {
-                Icon(Icons.Rounded.Add, contentDescription = null); Spacer(Modifier.size(4.dp)); Text("Add course")
-            }
+            TextButton(onClick = { subjects = subjects + Subject(nextId, "New course", "", "3"); nextId += 1 }) { Icon(Icons.Rounded.Add, contentDescription = null); Spacer(Modifier.size(4.dp)); Text("Add course") }
         }
         LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(bottom = 24.dp)) {
             items(subjects.size) { index ->
@@ -213,13 +207,13 @@ private fun GpaCalculatorScreen(onBack: () -> Unit) {
                 Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest)) {
                     Column(modifier = Modifier.padding(14.dp)) {
                         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                            OutlinedTextField(value = subject.name, onValueChange = { nameValue -> updateSubject(subject.id) { current -> current.copy(name = nameValue) } }, label = { Text("Course") }, singleLine = true, modifier = Modifier.weight(1f))
+                            OutlinedTextField(value = subject.name, onValueChange = { v -> updateSubject(subject.id) { it.copy(name = v) } }, label = { Text("Course") }, singleLine = true, modifier = Modifier.weight(1f))
                             IconButton(onClick = { if (subjects.size > 1) subjects = subjects.filterNot { it.id == subject.id } }) { Icon(Icons.Rounded.DeleteOutline, contentDescription = "Delete course", tint = Red) }
                         }
                         Spacer(Modifier.height(8.dp))
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedTextField(value = subject.grade, onValueChange = { gradeValue -> updateSubject(subject.id) { current -> current.copy(grade = gradeValue) } }, label = { Text("Grade (0–$scale)") }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.weight(1f))
-                            OutlinedTextField(value = subject.credits, onValueChange = { creditsValue -> updateSubject(subject.id) { current -> current.copy(credits = creditsValue) } }, label = { Text("Credits") }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.weight(1f))
+                            OutlinedTextField(value = subject.grade, onValueChange = { v -> updateSubject(subject.id) { it.copy(grade = v) } }, label = { Text("Grade (0–$scale)") }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.weight(1f))
+                            OutlinedTextField(value = subject.credits, onValueChange = { v -> updateSubject(subject.id) { it.copy(credits = v) } }, label = { Text("Credits") }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.weight(1f))
                         }
                     }
                 }
@@ -239,12 +233,10 @@ private fun FocusTimerScreen(onBack: () -> Unit) {
     var running by remember { mutableStateOf(prefs.getBoolean("running", false)) }
     var remainingMs by remember { mutableLongStateOf(loadRemaining(prefs)) }
     val selectedMinutes = when (mode) { "Focus" -> focusMinutes; "Break" -> breakMinutes; else -> customMinutesText.toIntOrNull()?.coerceIn(1, 180) ?: 30 }
-
     fun saveState() { prefs.edit().putString("mode", mode).putInt("focus_minutes", focusMinutes).putInt("break_minutes", breakMinutes).putInt("custom_minutes", customMinutesText.toIntOrNull()?.coerceIn(1, 180) ?: 30).putBoolean("running", running).apply() }
     fun start() { val duration = if (remainingMs > 0) remainingMs else selectedMinutes * 60_000L; val endAt = System.currentTimeMillis() + duration; remainingMs = duration; running = true; prefs.edit().putLong("end_at", endAt).putBoolean("running", true).apply(); scheduleTimer(context, endAt, mode) }
     fun pause() { remainingMs = loadRemaining(prefs); running = false; prefs.edit().putLong("remaining_ms", remainingMs).putBoolean("running", false).remove("end_at").apply(); cancelTimer(context) }
     fun reset() { running = false; remainingMs = selectedMinutes * 60_000L; prefs.edit().putLong("remaining_ms", remainingMs).putBoolean("running", false).remove("end_at").apply(); cancelTimer(context) }
-
     LaunchedEffect(running) {
         while (running) {
             val left = loadRemaining(prefs); remainingMs = left
@@ -252,47 +244,29 @@ private fun FocusTimerScreen(onBack: () -> Unit) {
             delay(250L)
         }
     }
-
     Column(modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp)) {
         Spacer(Modifier.height(28.dp))
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.Rounded.ArrowBack, contentDescription = "Back") }
-            Column(modifier = Modifier.padding(start = 4.dp)) { Text("Focus Timer", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold); Text("Stay focused. One session at a time.", style = MaterialTheme.typography.bodySmall) }
-        }
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = onBack) { Icon(Icons.Rounded.ArrowBack, contentDescription = "Back") }; Column(modifier = Modifier.padding(start = 4.dp)) { Text("Focus Timer", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold); Text("Stay focused. One session at a time.", style = MaterialTheme.typography.bodySmall) } }
         Spacer(Modifier.height(20.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("Focus", "Break", "Custom").forEach { item ->
                 val selected = mode == item
-                Card(onClick = { if (!running) { mode = item; remainingMs = when (item) { "Focus" -> focusMinutes * 60_000L; "Break" -> breakMinutes * 60_000L; else -> (customMinutesText.toIntOrNull()?.coerceIn(1, 180) ?: 30) * 60_000L }; saveState() } }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = if (selected) Red else MaterialTheme.colorScheme.surfaceContainerHighest)) {
-                    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) { Text(item, color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold) }
-                }
+                Card(onClick = { if (!running) { mode = item; remainingMs = when (item) { "Focus" -> focusMinutes * 60_000L; "Break" -> breakMinutes * 60_000L; else -> (customMinutesText.toIntOrNull()?.coerceIn(1, 180) ?: 30) * 60_000L }; saveState() } }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = if (selected) Red else MaterialTheme.colorScheme.surfaceContainerHighest)) { Box(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) { Text(item, color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold) } }
             }
         }
         Spacer(Modifier.height(20.dp))
         if (mode == "Custom") { OutlinedTextField(value = customMinutesText, onValueChange = { customMinutesText = it.filter(Char::isDigit).take(3) }, label = { Text("Custom duration (minutes)") }, singleLine = true, enabled = !running, modifier = Modifier.fillMaxWidth()); Spacer(Modifier.height(12.dp)) }
-        Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(32.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest)) {
-            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(if (running) mode else "$mode session", color = Red, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(12.dp)); Text(formatTime(remainingMs), fontSize = 64.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp); Spacer(Modifier.height(8.dp)); Text(if (running) "Timer is running in the background too" else "Ready when you are", style = MaterialTheme.typography.bodyMedium)
-            }
-        }
+        Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(32.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest)) { Column(modifier = Modifier.fillMaxWidth().padding(vertical = 30.dp), horizontalAlignment = Alignment.CenterHorizontally) { Text(if (running) mode else "$mode session", color = Red, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold); Spacer(Modifier.height(12.dp)); Text(formatTime(remainingMs), fontSize = 64.sp, fontWeight = FontWeight.Black, letterSpacing = 2.sp); Spacer(Modifier.height(8.dp)); Text(if (running) "Timer is running in the background too" else "Ready when you are", style = MaterialTheme.typography.bodyMedium) } }
         Spacer(Modifier.height(20.dp))
-        if (mode == "Focus" && !running) DurationPresets(focusMinutes) { focusMinutes = it; remainingMs = it * 60_000L; saveState() }
-        else if (mode == "Break" && !running) DurationPresets(breakMinutes) { breakMinutes = it; remainingMs = it * 60_000L; saveState() }
+        if (mode == "Focus" && !running) DurationPresets(focusMinutes) { focusMinutes = it; remainingMs = it * 60_000L; saveState() } else if (mode == "Break" && !running) DurationPresets(breakMinutes) { breakMinutes = it; remainingMs = it * 60_000L; saveState() }
         Spacer(Modifier.height(18.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Button(onClick = { if (running) pause() else start() }, modifier = Modifier.weight(1f).height(58.dp), shape = RoundedCornerShape(20.dp)) { Icon(if (running) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, contentDescription = null); Spacer(Modifier.size(8.dp)); Text(if (running) "Pause" else "Start", fontWeight = FontWeight.Bold) }
-            Card(onClick = { reset() }, modifier = Modifier.size(58.dp), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest)) { Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) { Icon(Icons.Rounded.RestartAlt, contentDescription = "Reset", tint = Red) } }
-        }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) { Button(onClick = { if (running) pause() else start() }, modifier = Modifier.weight(1f).height(58.dp), shape = RoundedCornerShape(20.dp)) { Icon(if (running) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, contentDescription = null); Spacer(Modifier.size(8.dp)); Text(if (running) "Pause" else "Start", fontWeight = FontWeight.Bold) }; Card(onClick = { reset() }, modifier = Modifier.size(58.dp), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHighest)) { Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) { Icon(Icons.Rounded.RestartAlt, contentDescription = "Reset", tint = Red) } } }
         Spacer(Modifier.height(12.dp)); TextButton(onClick = { mode = "Focus"; focusMinutes = 25; breakMinutes = 5; customMinutesText = "30"; reset() }, modifier = Modifier.align(Alignment.CenterHorizontally)) { Text("Restore 25 / 5 Pomodoro") }
     }
 }
 
 @Composable
-private fun DurationPresets(selected: Int, onSelected: (Int) -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf(15, 25, 50).forEach { minutes -> Card(onClick = { onSelected(minutes) }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = if (selected == minutes) Red.copy(alpha = .14f) else MaterialTheme.colorScheme.surfaceContainerHighest)) { Box(modifier = Modifier.fillMaxWidth().padding(vertical = 11.dp), contentAlignment = Alignment.Center) { Text("${minutes}m", color = if (selected == minutes) Red else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold) } } } }
-}
-
+private fun DurationPresets(selected: Int, onSelected: (Int) -> Unit) { Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf(15, 25, 50).forEach { minutes -> Card(onClick = { onSelected(minutes) }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = if (selected == minutes) Red.copy(alpha = .14f) else MaterialTheme.colorScheme.surfaceContainerHighest)) { Box(modifier = Modifier.fillMaxWidth().padding(vertical = 11.dp), contentAlignment = Alignment.Center) { Text("${minutes}m", color = if (selected == minutes) Red else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold) } } } } }
 private fun formatTime(ms: Long): String { val totalSeconds = (ms.coerceAtLeast(0L) + 999L) / 1000L; return String.format(Locale.US, "%02d:%02d", totalSeconds / 60L, totalSeconds % 60L) }
 private fun loadRemaining(prefs: android.content.SharedPreferences): Long { if (prefs.getBoolean("running", false)) return (prefs.getLong("end_at", 0L) - System.currentTimeMillis()).coerceAtLeast(0L); return prefs.getLong("remaining_ms", 0L) }
 private fun scheduleTimer(context: Context, endAt: Long, mode: String) { val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager; val intent = Intent(context, FocusTimerReceiver::class.java).putExtra("mode", mode); val pendingIntent = PendingIntent.getBroadcast(context, ALARM_REQUEST, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE); alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, endAt, pendingIntent) }
